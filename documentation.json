@@ -126,5 +126,9 @@
         ]
       }
     ]
-  }
+  },
+  "logo-dark": "https://blob-cdn.documentation.ai/org-cd4ff35e-cb5e-4bfd-add5-aca74775c9ad/doc-d02408b2-a338-4dd0-b920-9c24333f76d4/1793049092835-8kjshk4dae6-pullsure-logo-white.png?fm=auto&auto=compress%2Cformat",
+  "logo-light": "https://blob-cdn.documentation.ai/org-cd4ff35e-cb5e-4bfd-add5-aca74775c9ad/doc-d02408b2-a338-4dd0-b920-9c24333f76d4/1793049178955-odx26zfhmk-pullsure-logo-black.png?fm=auto&auto=compress%2Cformat",
+  "favicon": "https://blob-cdn.documentation.ai/org-cd4ff35e-cb5e-4bfd-add5-aca74775c9ad/doc-d02408b2-a338-4dd0-b920-9c24333f76d4/1793049198498-wjdo3ijwg4-pullsure-p-gradient.png?fm=auto&auto=compress%2Cformat",
+  "template": "atlas"
 }
