@@ -1,0 +1,254 @@
+---
+title: Authentication and Access
+description: Understand how to access Pullsure securely and manage user permissions across your team. This page covers sign-in methods, roles, and access controls for daily operations.
+---
+
+## Overview
+
+Use this page to understand how you sign in, how team access works, and how to troubleshoot common access issues. It is written as a starter kit, so you can adapt the examples to match your own identity provider, policy rules, and internal workflows.
+
+Pullsure teams usually need a simple sign-in path for daily work, plus stronger controls for administrators and sensitive actions. The sections below show a practical pattern for authentication, role assignment, session handling, and basic troubleshooting.
+
+<Callout kind="info">
+  Keep your sign-in flow consistent across your team. Clear roles and predictable access rules reduce support requests and lower the chance of accidental changes.
+</Callout>
+
+## Sign-in flow
+
+A typical sign-in flow should be short and clear: a user enters an email address, completes verification, and lands in the dashboard with the correct permissions. If your organization uses single sign-on, you can replace the email verification step with your identity provider.
+
+<Steps>
+  <Step title="Enter your work email" icon="mail">
+    The user submits their company email address and requests access. If the account already exists, you can route them to the next step automatically.
+  </Step>
+  <Step title="Verify identity" icon="shield">
+    The user completes verification through password, magic link, or single sign-on. Prefer the strongest method available for your organization.
+  </Step>
+  <Step title="Load the correct workspace" icon="users">
+    After verification, you assign the user to the proper team, role, and permissions before showing the dashboard.
+  </Step>
+  <Step title="Confirm access" icon="check-circle">
+    The user should see only the sections they are allowed to use, such as quotes, policy records, or admin settings.
+  </Step>
+</Steps>
+
+### Example sign-in request
+
+<CodeGroup tabs="JavaScript,Python,cURL">
+  ```javascript
+const response = await fetch("https://auth.example.com/sign-in", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    email: "samantha.lee@carrierco.com",
+    organization: "carrierco"
+  })
+});
+
+const data = await response.json();
+console.log(data.status);
+  ```
+
+  ```python
+import requests
+
+response = requests.post(
+    "https://auth.example.com/sign-in",
+    json={
+        "email": "samantha.lee@carrierco.com",
+        "organization": "carrierco"
+    },
+    timeout=10
+)
+
+data = response.json()
+print(data["status"])
+  ```
+
+  ```bash
+curl -X POST "https://auth.example.com/sign-in" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"samantha.lee@carrierco.com","organization":"carrierco"}'
+  ```
+</CodeGroup>
+
+## Authentication methods
+
+Different teams need different authentication methods. Use tabs to compare the common options so you can choose the right balance of convenience and security.
+
+<Tabs>
+  <Tab title="Password" icon="lock">
+    Use a strong password plus multi-factor authentication for standard access. This option works well when you manage accounts directly.
+
+    ```json
+    {
+      "method": "password",
+      "mfaRequired": true,
+      "sessionLengthMinutes": 480
+    }
+    ```
+  </Tab>
+  <Tab title="Magic link" icon="mail">
+    Send a one-time sign-in link to the user’s email address. This reduces password reuse but still depends on mailbox security.
+
+    ```json
+    {
+      "method": "magic-link",
+      "mfaRequired": false,
+      "expiresInMinutes": 15
+    }
+    ```
+  </Tab>
+  <Tab title="Single sign-on" icon="key">
+    Use your identity provider for centralized login and account lifecycle management. This is the best choice for larger teams.
+
+    ```json
+    {
+      "method": "sso",
+      "provider": "okta",
+      "mfaRequired": true
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Roles and permissions
+
+Use roles to define what a user can see and change. Keep the number of roles small at first, then refine them as your team grows. The examples below show a simple structure you can adapt.
+
+<Columns cols={3}>
+  <Card title="Admin" icon="settings" href="#roles-and-permissions">
+    Can manage users, permissions, and security settings.
+  </Card>
+  <Card title="Advisor" icon="users" href="#roles-and-permissions">
+    Can review records, create updates, and support daily operations.
+  </Card>
+  <Card title="Viewer" icon="eye" href="#roles-and-permissions">
+    Can view data without making security-sensitive changes.
+  </Card>
+</Columns>
+
+| Role | Typical access | Best for |
+|------|----------------|----------|
+| Admin | User management, policy settings, access review | Operations leads |
+| Advisor | Quotes, records, task updates, customer support | Day-to-day users |
+| Viewer | Read-only access | Auditors and stakeholders |
+
+### Permission example
+
+```json
+{
+  "userId": "usr_2048",
+  "role": "advisor",
+  "permissions": [
+    "quotes.read",
+    "quotes.create",
+    "policies.read",
+    "messages.send"
+  ]
+}
+```
+
+## Account security
+
+Treat account security as part of daily operations, not as an afterthought. Require strong authentication, remove access when someone changes roles, and review inactive accounts on a schedule.
+
+<Callout kind="alert">
+  Do not share accounts between users. Shared access makes it difficult to audit changes, revoke access quickly, and protect sensitive data.
+</Callout>
+
+### Recommended controls
+
+- Require multi-factor authentication for all privileged users.
+- Use time-limited sessions for shared devices.
+- Revoke access immediately when a team member leaves.
+- Review role assignments at least once per quarter.
+- Log sign-in events so you can trace security issues later.
+
+## Team access management
+
+When you add or remove team members, follow the same process every time. Consistent access management prevents gaps and avoids over-permissioned accounts.
+
+<Steps>
+  <Step title="Create the account" icon="user-plus">
+    Add the user with their company email and assign the smallest useful role.
+  </Step>
+  <Step title="Assign workspace access" icon="folder-plus">
+    Place the user in the correct team or region so they only see the records they need.
+  </Step>
+  <Step title="Confirm permissions" icon="shield-check">
+    Test the account with a realistic workflow to confirm the user can complete their tasks.
+  </Step>
+  <Step title="Schedule review" icon="calendar">
+    Set a recurring review for role changes, inactive accounts, and privilege escalation requests.
+  </Step>
+</Steps>
+
+## Session and access troubleshooting
+
+If a user cannot sign in, check the issue in this order: identity, session, role, then workspace assignment. This reduces guesswork and helps you solve the problem faster.
+
+<Expandable title="The user never receives a sign-in link" default-open="true">
+  Check the email address, inbox filters, and whether the account is already disabled. If your system uses an email link, confirm the link expiration window is long enough for normal usage.
+</Expandable>
+
+<Expandable title="The user signs in but sees the wrong data" default-open="false">
+  Verify the assigned role, team membership, and workspace mapping. This usually means the account is valid, but the permissions or org assignment are incorrect.
+</Expandable>
+
+<Expandable title="The session expires too quickly" default-open="false">
+  Review your session lifetime, idle timeout, and remember-device settings. Short sessions are useful on shared computers, but they can frustrate users if they are too aggressive.
+</Expandable>
+
+### Troubleshooting checklist
+
+1. Confirm the email address is correct.
+2. Check whether the account is active.
+3. Verify the role and permissions.
+4. Review recent session changes.
+5. Test access in a fresh browser window.
+
+## Implementation example
+
+The following example shows a simple access-checking pattern that you can adapt for your own application. It validates the response, stores a session token, and redirects the user to the correct workspace.
+
+```javascript
+async function signInUser(email, password) {
+  const response = await fetch("https://auth.example.com/session", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      email,
+      password,
+      workspace: "pullsure"
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error("Sign-in failed");
+  }
+
+  const result = await response.json();
+  localStorage.setItem("sessionToken", result.token);
+  window.location.assign("https://dashboard.example.com");
+}
+
+signInUser("samantha.lee@carrierco.com", "YOUR_PASSWORD");
+```
+
+## Next steps
+
+Use this page as your baseline, then adjust the sign-in method, role model, and security rules to match your team. If you later add broader onboarding or API documentation, keep the same language and access patterns so the experience stays consistent.
+
+<Columns cols={2}>
+  <Card title="Quickstart" icon="book-open" href="/quickstart" horizontal>
+    Learn the basics of setup and first-time use.
+  </Card>
+  <Card title="Introduction" icon="arrow-right" href="/introduction" horizontal>
+    Start from the documentation home page.
+  </Card>
+</Columns>

@@ -1,0 +1,234 @@
+---
+title: Core Features
+description: Learn the main capabilities of Pullsure, including quoting, advisor collaboration, safety insights, and policy management. Use this guide to understand what each part of the platform does.
+---
+
+## Overview
+
+Pullsure helps you organize the core workflows that matter most in commercial trucking insurance: quote shopping, advisor communication, document handling, renewal prep, and fleet safety. This page is a starter kit template, so you can adapt the examples and terminology to match your own process.
+
+Use this guide to understand how the platform fits together before you customize your implementation. The examples below show realistic workflows, sample data, and common operational patterns.
+
+<Callout kind="info">
+  This is a starter kit template. Replace the sample labels, workflows, and sample data with your own product details before publishing.
+</Callout>
+
+## Core capabilities
+
+<Columns cols={2}>
+  <Card title="Quote shopping" icon="bar-chart" href="#quote-shopping">
+    Compare carrier options and review pricing signals in one place.
+  </Card>
+  <Card title="Named advisor communication" icon="users" href="#named-advisor-communication">
+    Keep a consistent point of contact for updates, questions, and follow-up.
+  </Card>
+  <Card title="Documents and COIs" icon="book-open" href="#documents-and-cois">
+    Store policy files, certificates, and renewal paperwork in a single workflow.
+  </Card>
+  <Card title="Safety and renewal insights" icon="shield" href="#safety-and-renewal-insights">
+    Track fleet performance signals that help guide renewals and risk decisions.
+  </Card>
+</Columns>
+
+## How the workflow fits together
+
+<Steps>
+  <Step title="Submit quote details" icon="upload">
+    Enter fleet and coverage information, then send the request for review. You can include basic company data, driver counts, vehicle counts, and target effective dates.
+  </Step>
+  <Step title="Review market options" icon="search">
+    Compare carrier responses as they arrive. Look for pricing, coverage fit, and any conditions that affect the final offer.
+  </Step>
+  <Step title="Collaborate with your advisor" icon="message-circle">
+    Ask questions, share documents, and clarify underwriting requests with your named advisor so you do not have to restart the conversation.
+  </Step>
+  <Step title="Prepare for renewal" icon="refresh-cw">
+    Use safety trends, document status, and claims history to organize a stronger renewal package before the next term begins.
+  </Step>
+</Steps>
+
+## Quote shopping
+
+Quote shopping helps you compare multiple market options without manually tracking every carrier separately. A strong quoting workflow usually includes intake, carrier matching, follow-up questions, and a final recommendation.
+
+### Example quote payload
+
+<CodeGroup tabs="JavaScript,cURL">
+  ```javascript
+  const quoteRequest = {
+    accountName: "Starline Logistics LLC",
+    dotNumber: "3141592",
+    fleetType: "regional trucking",
+    vehicles: 18,
+    drivers: 22,
+    effectiveDate: "2026-01-01",
+    requestedCoverages: ["auto liability", "cargo", "physical damage"]
+  };
+
+  const response = await fetch("https://api.example.com/quotes", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_API_TOKEN"
+    },
+    body: JSON.stringify(quoteRequest)
+  });
+  ```
+  ```bash
+  curl -X POST "https://api.example.com/quotes" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer YOUR_API_TOKEN" \
+    -d '{
+      "accountName": "Starline Logistics LLC",
+      "dotNumber": "3141592",
+      "fleetType": "regional trucking",
+      "vehicles": 18,
+      "drivers": 22,
+      "effectiveDate": "2026-01-01",
+      "requestedCoverages": ["auto liability", "cargo", "physical damage"]
+    }'
+  ```
+</CodeGroup>
+
+### What to look for
+
+- Whether the requested coverages match your risk profile
+- Which carriers return competitive pricing
+- Whether underwriting conditions add extra work later
+- How quickly you can move from intake to recommendation
+
+## Named advisor communication
+
+Named advisors give you a direct line for questions, document follow-up, and time-sensitive requests. This reduces back-and-forth and helps you avoid repeating the same context across multiple conversations.
+
+<Tabs>
+  <Tab title="Email" icon="mail">
+    Use email when you need a written record, shared attachments, or a clear summary of next steps.
+
+    ```text
+    Subject: Renewal documents for the 2026 term
+
+    Hi Jordan,
+
+    I have attached the updated driver roster and loss runs.
+    Please confirm whether you need any additional documents before carrier review.
+
+    Thanks,
+    Alex
+    ```
+  </Tab>
+  <Tab title="Text" icon="message-circle">
+    Use text for quick clarifications, status checks, and same-day follow-up.
+
+    ```text
+    Hi Jordan, can you confirm whether the COI was issued for the new shipper?
+    ```
+  </Tab>
+  <Tab title="Shared workspace" icon="folder">
+    Use a shared workspace for policy documents, renewal notes, and carrier questions that need to stay organized.
+
+    ```text
+    Renewal checklist:
+    - Loss runs
+    - Driver schedule
+    - Vehicle schedule
+    - Prior term declarations page
+    ```
+  </Tab>
+</Tabs>
+
+## Documents and COIs
+
+Document handling keeps certificates, policy forms, and renewal files easy to find when you need them. That matters when a shipper asks for proof of coverage, when a carrier needs a signed form, or when your team is preparing renewal materials.
+
+### Common document types
+
+| Document type | Typical use |
+| --- | --- |
+| COI | Proof of coverage for shippers, brokers, or vendors |
+| Declarations page | Summary of policy terms and coverages |
+| Loss runs | Historical claims data used in underwriting |
+| Renewal packet | Supporting materials for the next policy term |
+
+<Callout kind="tip">
+  Keep document names consistent so your team can find the latest version quickly during renewal season.
+</Callout>
+
+## Safety and renewal insights
+
+Safety insights help you understand fleet risk over time, not just at the point of sale. Use operational data to spot trends early, then bring those trends into renewal planning.
+
+### Example safety dashboard data
+
+```json
+{
+  "fleetName": "Starline Logistics LLC",
+  "scoreDate": "2026-01-15",
+  "scores": {
+    "driving": 91,
+    "hoursOfService": 88,
+    "fitness": 94,
+    "csa": 96,
+    "vehicle": 90,
+    "sureScore": 92
+  },
+  "alerts": [
+    "New hard-braking trend detected on route 12",
+    "Driver assignment review recommended for two units"
+  ]
+}
+```
+
+### How you might use the data
+
+1. Review alerts weekly instead of waiting for renewal.
+2. Share notable trends with your advisor before carrier review.
+3. Track improvements over time so you can show progress at renewal.
+4. Escalate recurring issues that may affect pricing or eligibility.
+
+## Claims and renewal workflows
+
+Claims history and renewal prep are closely connected. When you understand what happened during the term, you can present a clearer story to carriers and reduce avoidable surprises.
+
+<Expandable title="What to include in a renewal package" default-open="true">
+  
+- Current policy documents
+- Updated vehicle and driver schedules
+- Recent claims summary
+- Safety improvements and training updates
+- Any changes to routes, freight, or operations
+  
+</Expandable>
+
+<Expandable title="How to handle a new claim" default-open="false">
+  
+- Log the claim as soon as it is reported
+- Capture date, location, vehicle, and involved parties
+- Notify your advisor if the loss may affect renewal timing
+- Keep supporting documents in one place for follow-up
+  
+</Expandable>
+
+## Practical example
+
+Use the following sequence when you want a simple, repeatable internal process:
+
+<Steps>
+  <Step title="Collect information" icon="clipboard-list">
+    Gather fleet details, coverages, and the renewal timeline before you start.
+  </Step>
+  <Step title="Request market review" icon="send">
+    Send the submission and wait for carrier responses.
+  </Step>
+  <Step title="Coordinate the decision" icon="check-circle">
+    Compare options with your advisor, then confirm the selected path forward.
+  </Step>
+</Steps>
+
+## Next steps
+
+If you are customizing this starter kit, replace the sample names, payloads, and workflow labels with your own operational terms. You can also add links to related pages such as quickstart, authentication, or changelog content if those pages exist in your documentation set.
+
+<Callout kind="success">
+  You now have a complete starter overview for the main product workflows. Adapt the examples to match your own quoting, servicing, and renewal process.
+</Callout>

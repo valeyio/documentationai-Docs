@@ -1,0 +1,296 @@
+---
+title: Integrations
+description: Connect Pullsure with the tools and data sources that support fleet safety and insurance operations. This page covers common integrations, data sharing, and setup considerations.
+---
+
+## Overview
+
+Pullsure integrations help you connect fleet safety data, insurance workflows, and operational notifications in one place. You can use them to reduce manual entry, keep records current, and share the right data with advisors, carriers, and internal teams.
+
+This starter kit page shows common integration patterns you can adapt to your own environment. Replace the sample endpoints, field names, and workflows with the systems you actually use.
+
+<Callout kind="info">
+  This is a starter kit template. Use it as a foundation for your own documentation, and adjust the examples to match your product, data model, and approval process.
+</Callout>
+
+## Integration categories
+
+<Columns cols={3}>
+  <Card title="FMCSA data sources" icon="database" href="#fmcsa-data-sources">
+    Pull in authority, safety, and registration data to keep fleet profiles current.
+  </Card>
+  <Card title="Scorecard integrations" icon="bar-chart" href="#driver-scorecard-integrations">
+    Send driving and safety signals from telematics or scorecard platforms.
+  </Card>
+  <Card title="Workflows and webhooks" icon="zap" href="#webhooks-and-api-connections">
+    Trigger document, notification, and system updates when records change.
+  </Card>
+</Columns>
+
+## FMCSA data sources
+
+Many fleet teams use FMCSA-connected data to verify carrier status, monitor safety events, and keep compliance records up to date. Common inputs include authority status, inspection history, crash counts, and safety performance indicators.
+
+You should decide which data arrives through scheduled syncs and which data updates in real time. For example, you might refresh fleet records nightly, while sending alerts immediately when a safety threshold changes.
+
+### Typical data points
+
+| Data point | Why it matters | Common update pattern |
+|------------|----------------|-----------------------|
+| Authority status | Confirms active operating authority | Daily sync |
+| Inspection activity | Helps spot recent safety issues | Near real time |
+| Crash history | Supports underwriting review | Daily or weekly sync |
+| Safety scores | Tracks performance trends | Scheduled refresh |
+| Registration status | Verifies active fleet records | Daily sync |
+
+<Callout kind="tip">
+  Keep a clear source-of-truth rule for each field. If multiple systems provide the same value, document which one wins.
+</Callout>
+
+## Driver scorecard integrations
+
+Driver scorecard data often comes from telematics, ELD, or safety platforms. You can use these integrations to surface driving behavior, identify coaching opportunities, and support renewal conversations.
+
+The most useful scorecard integrations share consistent identifiers, such as driver ID, vehicle ID, and reporting period. That makes it easier to reconcile records across systems and avoid duplicate entries.
+
+### Example scorecard payload
+
+```json
+{
+  "fleet_id": "fleet_2048",
+  "driver_id": "drv_1832",
+  "reporting_period": {
+    "start": "2026-01-01",
+    "end": "2026-01-31"
+  },
+  "scores": {
+    "driving": 91,
+    "hos": 88,
+    "fitness": 94,
+    "csa": 96,
+    "vehicle": 90,
+    "sure_score": 92
+  },
+  "updated_at": "2026-01-31T18:22:10Z"
+}
+```
+
+### Integration options
+
+<Tabs>
+  <Tab title="API sync" icon="code">
+    Use an API when your platform can request or send score data on demand.
+
+    ```javascript
+    const response = await fetch("https://api.example.com/v1/scorecards", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer YOUR_API_TOKEN"
+      },
+      body: JSON.stringify({
+        fleet_id: "fleet_2048",
+        driver_id: "drv_1832",
+        driving_score: 91
+      })
+    });
+
+    const result = await response.json();
+    console.log(result.status);
+    ```
+  </Tab>
+  <Tab title="Webhook event" icon="zap">
+    Use a webhook when your scorecard provider needs to push changes as soon as they happen.
+
+    ```json
+    {
+      "event": "scorecard.updated",
+      "fleet_id": "fleet_2048",
+      "driver_id": "drv_1832",
+      "score_type": "driving",
+      "value": 91,
+      "timestamp": "2026-01-31T18:22:10Z"
+    }
+    ```
+  </Tab>
+  <Tab title="File import" icon="upload">
+    Use file import when your team receives periodic exports from another system.
+
+    ```csv
+    fleet_id,driver_id,driving,hos,fitness,csa,vehicle,sure_score
+    fleet_2048,drv_1832,91,88,94,96,90,92
+    ```
+  </Tab>
+</Tabs>
+
+## Document and notification workflows
+
+Integrations are often most valuable when they remove manual follow-up. You can connect document generation, certificate requests, renewal reminders, and internal alerts so your team spends less time chasing updates.
+
+A common pattern is to trigger notifications when a document is issued, when a policy is nearing renewal, or when a risk threshold changes. You can route those events to email, Slack-style messaging, ticketing tools, or a CRM.
+
+<Steps>
+  <Step title="Define the event" icon="settings">
+    Choose the business event that should trigger the workflow, such as a new certificate request or a renewed policy record.
+  </Step>
+  <Step title="Map the recipients" icon="users">
+    Decide who should receive the notification, such as an advisor, account manager, or operations lead.
+  </Step>
+  <Step title="Send the payload" icon="upload">
+    Pass the minimum data needed to complete the task, including policy ID, fleet ID, and the target contact.
+  </Step>
+  <Step title="Record the outcome" icon="check-circle">
+    Save the delivery status so you can audit the workflow later and retry if needed.
+  </Step>
+</Steps>
+
+### Example notification event
+
+```json
+{
+  "event": "document.certificate_issued",
+  "policy_id": "pol_4819",
+  "fleet_id": "fleet_2048",
+  "recipient": {
+    "name": "Jordan Lee",
+    "email": "jordan.lee@example.com"
+  },
+  "status": "delivered",
+  "issued_at": "2026-01-31T19:05:00Z"
+}
+```
+
+## Carrier and broker data sharing
+
+When you share data with carriers or broker partners, keep the payload focused and permissioned. Share only the fields needed for underwriting, servicing, or renewal support.
+
+You can organize shared data into three broad groups:
+
+- Fleet profile data, such as entity name, operating locations, and vehicle counts
+- Safety data, such as recent incidents, scorecards, and compliance trends
+- Transaction data, such as document status, quote requests, and renewal milestones
+
+### Suggested sharing rules
+
+| Data type | Share with carrier | Share with broker | Share internally only |
+|-----------|-------------------|------------------|-----------------------|
+| Fleet profile | Yes | Yes | No |
+| Scorecard history | Yes | Yes | No |
+| Driver-level detail | Sometimes | Sometimes | Often yes |
+| Claims notes | Sometimes | Sometimes | Often yes |
+| Payment status | Sometimes | Sometimes | Often yes |
+
+<Callout kind="alert">
+  Do not share sensitive data unless you have a clear business reason and a documented permission model.
+</Callout>
+
+## Webhooks and API connections
+
+Webhooks and APIs give you two reliable ways to connect Pullsure to other systems. Use webhooks when you want to react to events, and use APIs when you need to request or update data directly.
+
+A practical setup usually includes authentication, idempotency, retries, and logging. These controls help you avoid duplicate records and make failures easier to diagnose.
+
+### Webhook example
+
+```bash
+curl -X POST "https://your-webhook-url.com/webhook" \
+  -H "Content-Type: application/json" \
+  -H "X-Pullsure-Event: policy.renewal_due" \
+  -d '{
+    "policy_id": "pol_4819",
+    "fleet_id": "fleet_2048",
+    "renewal_date": "2026-03-15",
+    "days_remaining": 43
+  }'
+```
+
+### API request example
+
+<CodeGroup tabs="JavaScript,Python,cURL">
+  ```javascript
+const response = await fetch("https://api.example.com/v1/integrations/events", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer YOUR_API_TOKEN",
+    "Idempotency-Key": "evt_20260131_0001"
+  },
+  body: JSON.stringify({
+    event_type: "renewal.reminder_sent",
+    fleet_id: "fleet_2048",
+    policy_id: "pol_4819"
+  })
+});
+
+const data = await response.json();
+console.log(data.event_id);
+  ```
+  ```python
+import requests
+
+response = requests.post(
+    "https://api.example.com/v1/integrations/events",
+    headers={
+        "Authorization": "Bearer YOUR_API_TOKEN",
+        "Content-Type": "application/json",
+        "Idempotency-Key": "evt_20260131_0001"
+    },
+    json={
+        "event_type": "renewal.reminder_sent",
+        "fleet_id": "fleet_2048",
+        "policy_id": "pol_4819"
+    },
+    timeout=30
+)
+
+print(response.json()["event_id"])
+  ```
+  ```bash
+curl -X POST "https://api.example.com/v1/integrations/events" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Idempotency-Key: evt_20260131_0001" \
+  -d '{
+    "event_type": "renewal.reminder_sent",
+    "fleet_id": "fleet_2048",
+    "policy_id": "pol_4819"
+  }'
+  ```
+</CodeGroup>
+
+## Setup considerations
+
+Before you enable an integration, confirm the data owner, refresh cadence, failure behavior, and audit requirements. Those decisions matter more than the transport method itself.
+
+<Expandable title="Advanced setup checklist" default-open="false">
+  
+- Confirm which system owns each field.
+- Define how often data should refresh.
+- Decide whether failures should retry automatically.
+- Document who can view, edit, and export data.
+- Keep an audit log for every sync or event.
+
+</Expandable>
+
+<Expandable title="Recommended validation rules" default-open="false">
+  
+- Reject incomplete fleet identifiers.
+- Require timestamps in ISO 8601 format.
+- Limit retries for duplicate webhook deliveries.
+- Store integration status separately from business data.
+- Alert on repeated authentication failures.
+
+</Expandable>
+
+## Next steps
+
+Use this page as a starting point and customize it for your implementation. If you support more specific connectors, add a dedicated section for each one and include field mappings, authentication details, and sample payloads.
+
+<Columns cols={2}>
+  <Card title="Quickstart" icon="book-open" href="/quickstart" horizontal>
+    Learn how to set up your first workflow in a few minutes.
+  </Card>
+  <Card title="Authentication" icon="lock" href="/authentication" horizontal>
+    Review secure access patterns for API and webhook connections.
+  </Card>
+</Columns>

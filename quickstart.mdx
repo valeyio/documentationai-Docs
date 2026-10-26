@@ -1,0 +1,216 @@
+---
+title: Quickstart
+description: Get set up with Pullsure and complete your first fleet setup, quote request, or account workflow in minutes. This page helps new users move from login to action quickly.
+---
+
+## Overview
+
+Welcome to Pullsure. This starter kit shows you the fastest path from sign in to your first working workflow so you can organize your fleet, request a quote, and bring teammates into the process with less friction.
+
+Use this page as a launchpad. It covers account setup, fleet profile creation, quote submission, team invites, and a first-pass dashboard tour. You can customize each step to match your own operating model later.
+
+<Callout kind="info">
+
+This page is a template. Replace sample field names, workflow steps, and dashboard labels with your own product details as your implementation evolves.
+
+</Callout>
+
+## What you can do first
+
+<Columns cols={2}>
+  <Card title="Sign in" icon="lock" href="https://app.pullsure.com/sign-in">
+    Access your account and confirm your profile details.
+  </Card>
+  <Card title="Create a fleet profile" icon="users" href="#create-a-fleet-profile">
+    Add your business details, vehicles, and operating footprint.
+  </Card>
+  <Card title="Request a quote" icon="bar-chart" href="#submit-a-quote-request">
+    Submit the information needed for a first pass pricing review.
+  </Card>
+  <Card title="Invite teammates" icon="send" href="#invite-teammates-or-advisors">
+    Bring in the people who help you manage renewals and safety.
+  </Card>
+</Columns>
+
+## Quick start path
+
+<Steps>
+  <Step title="Sign in and confirm your account" icon="log-in">
+    Open the sign in page and verify your email address, company name, and contact details. If your organization uses a shared account, confirm who should own the primary login before you continue.
+
+    ````bash
+    open "https://app.pullsure.com/sign-in"
+    ````
+  </Step>
+  <Step title="Create a fleet profile" icon="users">
+    Add your legal business name, DOT number, base state, and the approximate number of power units you operate. Start with the basics so you can move forward quickly, then refine the profile later.
+
+    ````json
+    {
+      "legalName": "Starline Logistics LLC",
+      "dotNumber": "314",
+      "baseState": "TX",
+      "fleetSize": 18
+    }
+    ````
+  </Step>
+  <Step title="Submit your first quote request" icon="send">
+    Share a snapshot of your fleet, safety history, and coverage needs. A complete request helps you compare options faster and reduces back-and-forth during review.
+  </Step>
+  <Step title="Invite teammates or advisors" icon="users">
+    Add the people who need visibility into quotes, renewals, or safety work. You can keep access limited or give broader collaboration rights depending on your workflow.
+  </Step>
+</Steps>
+
+## Create a fleet profile
+
+A strong fleet profile helps you move from setup to action faster. Include the details that matter most for underwriting and renewal planning, then keep the record current as your operation changes.
+
+<CodeGroup tabs="JSON,JavaScript,Python">
+  ```json
+  {
+    "companyName": "Starline Logistics LLC",
+    "dotNumber": "314",
+    "mcNumber": "MC-109283",
+    "statesOperated": ["TX", "OK", "NM", "LA"],
+    "vehicleCount": 18,
+    "trailerCount": 24,
+    "primaryContact": {
+      "name": "Alicia Rivera",
+      "email": "alicia@starlinelogistics.com"
+    }
+  }
+  ```
+  ```javascript
+  async function saveFleetProfile() {
+    const response = await fetch("https://api.example.com/fleets", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer YOUR_TOKEN"
+      },
+      body: JSON.stringify({
+        companyName: "Starline Logistics LLC",
+        dotNumber: "314",
+        vehicleCount: 18
+      })
+    });
+
+    return response.json();
+  }
+  ```
+  ```python
+  import requests
+
+  payload = {
+      "companyName": "Starline Logistics LLC",
+      "dotNumber": "314",
+      "vehicleCount": 18
+  }
+
+  response = requests.post(
+      "https://api.example.com/fleets",
+      json=payload,
+      headers={"Authorization": "Bearer YOUR_TOKEN"}
+  )
+
+  print(response.json())
+  ```
+</CodeGroup>
+
+## Submit a quote request
+
+You can request a quote once your fleet profile contains enough information for a first review. Use current values whenever possible, including your operating states, unit counts, and safety data. If a field is still unknown, add it later rather than delaying the workflow.
+
+<Tabs>
+  <Tab title="Web app" icon="monitor">
+
+    Open your fleet profile, choose quote request, and follow the prompts for coverage, vehicles, and contact preferences.
+
+  </Tab>
+  <Tab title="API" icon="code">
+
+    ````bash
+    curl -X POST "https://api.example.com/quote-requests" \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer YOUR_TOKEN" \
+      -d '{
+        "fleetId": "fleet_01HT8YQ2D5X4",
+        "requestedCoverage": "primary-auto-liability",
+        "units": 18,
+        "states": ["TX", "OK", "NM", "LA"]
+      }'
+    ````
+
+  </Tab>
+  <Tab title="Support-assisted" icon="users">
+
+    If you prefer a guided workflow, ask an advisor to help assemble the request. This works well when you need help gathering records or confirming renewal timing.
+
+  </Tab>
+</Tabs>
+
+## Invite teammates or advisors
+
+Pullsure works best when everyone who touches the renewal process can see the same information. Invite your operations lead, safety contact, or outside advisor so they can review notes and act on tasks without relying on email threads.
+
+```bash
+curl -X POST "https://api.example.com/team-invites" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{
+    "email": "jamie@starlinelogistics.com",
+    "role": "advisor",
+    "fleetId": "fleet_01HT8YQ2D5X4"
+  }'
+```
+
+<Callout kind="tip">
+
+Give each person only the access they need. A narrow permission set keeps the workspace clean and helps you avoid accidental changes during renewal season.
+
+</Callout>
+
+## First dashboard tour
+
+When you land on the dashboard, look for the places where your next action lives. Start with your fleet summary, then review active tasks, open requests, and any monitoring alerts that need attention. A quick tour helps you understand where to return when you need a status update.
+
+### What to check first
+
+- Profile completeness and missing business details
+- Open quote requests and renewal milestones
+- Team members and advisor access
+- Safety alerts, document requests, or pending tasks
+
+### Recommended setup checklist
+
+<ExpandableGroup>
+  <Expandable title="Confirm account ownership" default-open="true">
+
+    Make sure one person owns the primary account and billing contact so renewal notices and approvals do not get lost.
+
+  </Expandable>
+  <Expandable title="Review fleet details" default-open="false">
+
+    Verify your legal name, DOT number, operating states, and contact information before submitting your first request.
+
+  </Expandable>
+  <Expandable title="Add teammates" default-open="false">
+
+    Invite the people who need visibility into underwriting, safety, or service tasks so your workflow stays collaborative.
+
+  </Expandable>
+</ExpandableGroup>
+
+## Next steps
+
+Once you finish the basics, you can tailor the workspace around your renewal process, safety program, and reporting needs. If you want a deeper setup pattern, follow the same sequence you see here: profile first, request second, collaboration third.
+
+<Columns cols={2}>
+  <Card title="Explore the dashboard" icon="bar-chart" href="https://dashboard.example.com">
+    Review tasks, alerts, and fleet status in one place.
+  </Card>
+  <Card title="Return to sign in" icon="lock" href="https://app.pullsure.com/sign-in">
+    Continue setup or hand off work to a teammate.
+  </Card>
+</Columns>
